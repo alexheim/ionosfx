@@ -1,0 +1,3 @@
+rootProject.name = 'ionos-client'
+
+include ':ionos-api'

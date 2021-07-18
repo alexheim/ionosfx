@@ -1,0 +1,66 @@
+buildscript {
+    ext {
+        targetJavaVersion = "16"
+        kotlinVersion = "1.5.21"
+        javafx_version = '16'
+    }
+}
+
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.5.21'
+    id 'org.openjfx.javafxplugin' version '0.0.10'
+    id "org.openapi.generator" version "5.1.1"
+}
+
+group 'de.etractive'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+javafx {
+    version = "$javafx_version"
+    modules = ['javafx.controls', 'javafx.media', 'javafx.graphics', 'javafx.web', 'javafx.swing', 'javafx.fxml']
+}
+compileKotlin {
+    kotlinOptions.jvmTarget = targetJavaVersion
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = targetJavaVersion
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlin:kotlin-reflect"
+
+    implementation('no.tornado:tornadofx:1.+') {
+        exclude group: 'org.jetbrains.kotlin'
+    }
+}
+
+task downloadOpenApiSpec {
+    doLast {
+        ant.get(src: "https://developer.hosting.ionos.de/assets/swagger-specs/dns.yaml", dest: "${buildDir.absolutePath}/dns.yaml")
+    }
+}
+
+openApiGenerate {
+    verbose = true
+    inputSpec = "${projectDir.absolutePath}/build/dns.yaml".toString()
+    generatorName = "kotlin"
+    outputDir = "${projectDir.absolutePath}/ionos-api".toString()
+    library = "jvm-retrofit2"
+    validateSpec = false
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    dependencies {
+        implementation "org.jetbrains.kotlin:kotlin-stdlib"
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+        implementation "org.jetbrains.kotlin:kotlin-reflect"
+    }
+}

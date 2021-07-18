@@ -1,0 +1,6 @@
+*.db
+*.css.map
+.gradle
+.idea
+out
+build
